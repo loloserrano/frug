@@ -1,0 +1,258 @@
+---
+title: "frug2"
+output: html_document
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/plotly-binding/plotly.js"></script>
+<script src="/rmarkdown-libs/typedarray/typedarray.min.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/crosstalk/js/crosstalk.min.js"></script>
+<link href="/rmarkdown-libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/plotly-main/plotly-latest.min.js"></script>
+
+
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ───────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
+## ✓ tibble  3.0.3     ✓ dplyr   1.0.2
+## ✓ tidyr   1.1.2     ✓ stringr 1.4.0
+## ✓ readr   1.3.1     ✓ forcats 0.5.0</code></pre>
+<pre><code>## ── Conflicts ──────────────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(readxl)
+library(plotly)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plotly&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     last_plot</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout</code></pre>
+<pre class="r"><code>contracts &lt;- read_excel(&quot;/Users/professorserrano/Desktop/Documents/Video Essays/Law/contracts_gender_r_2.xlsx&quot;)
+defs &lt;- read_excel(&quot;/Users/professorserrano/Desktop/Documents/Video Essays/Law/defs_r.xlsx&quot;)
+plfs &lt;- read_excel(&quot;/Users/professorserrano/Desktop/Documents/Video Essays/Law/plfs_r.xlsx&quot;)
+parties &lt;- read_excel(&quot;/Users/professorserrano/Desktop/Documents/Video Essays/Law/parties_r.xlsx&quot;)
+cites &lt;- read_excel(&quot;/Users/professorserrano/Desktop/Documents/Video Essays/Law/cites_for_contracts.xlsx&quot;)
+
+contracts %&gt;%
+  group_by(year) %&gt;%
+  count() %&gt;%
+  ggplot() +
+  geom_point(mapping=aes(year,n),alpha = 0.5, size = 3, position = position_jitter(w = 0, h = 0.1)) + 
+  labs(title = &quot;Distribution of Cases over Time&quot;)</code></pre>
+<p><img src="./frug2_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>contracts %&gt;%
+  group_by(year) %&gt;%
+  ggplot() +
+  geom_bar(mapping=aes(year)) +
+  labs(title = &quot;Number of Cases by Year&quot;)</code></pre>
+<p><img src="./frug2_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+<pre class="r"><code>contracts %&gt;%
+  group_by(year) %&gt;%
+  ggplot() +
+  geom_histogram(mapping=aes(year,fill = transaction),breaks = c(1820,1830,1840,1850,1860,1870,1880,1890,1900,1910,1920,1930,1940, 1950, 1960,1970,1980,1990,2000,2010,2020)) +
+  labs(title = &quot;Number of Cases by Decade&quot;)</code></pre>
+<p><img src="./frug2_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
+<pre class="r"><code>names(cites) &lt;- c(&quot;page&quot;,&quot;cite&quot;)
+parties &lt;- parties %&gt;%
+  full_join(cites, by = &quot;page&quot;)
+
+contracts %&gt;%
+  filter(transaction == &quot;Property&quot;) %&gt;%
+  select(transaction, page, cite)</code></pre>
+<pre><code>## # A tibble: 13 x 3
+##    transaction  page cite                                                       
+##    &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;                                                      
+##  1 Property       47 Lonergan v. Scolnick, 129 Cal. App. 2d 179 (1954).         
+##  2 Property       51 Normile v. Miller, 313 N.C. 98 (1985).                     
+##  3 Property      227 Kirksey v. Kirksey, 8 Ala. 131 (1845)                      
+##  4 Property      228 Harvey v. Dow, 962 A.2d.322 (Me. 2008).                    
+##  5 Property      237 King v. Trustees of Boston Univ., 420 Mass. 52 (1995)      
+##  6 Property      266 Berryman v. Kmoch, 221 Kan. 304 (1977)                     
+##  7 Property      357 Beaver v. Brumlow, 148 N.M. 172 (N.M. Ct. App. 2010)       
+##  8 Property      381 Buffaloe v. Hart, 114 N.C. App 52 (1994).                  
+##  9 Property      572 Dodson v. Shrader, 824 S.W.2d 545 (Tenn. 1992)             
+## 10 Property      579 Sparrow v. Demonico, 461 Mass. 322 (2012)                  
+## 11 Property      622 Hill v. Jones, 151 Ariz. 81 (1986)                         
+## 12 Property      650 Higgins v. Super. Ct. of Los Angeles County, 140 Cal. App.…
+## 13 Property      720 Lenawee County Board of Health v. Messerly, 417 Mich. 17 (…</code></pre>
+<pre class="r"><code>names(parties)</code></pre>
+<pre><code>## [1] &quot;page&quot;        &quot;year&quot;        &quot;transaction&quot; &quot;party1&quot;      &quot;typenomf&quot;   
+## [6] &quot;typemf&quot;      &quot;spouse&quot;      &quot;side&quot;        &quot;cite&quot;</code></pre>
+<pre class="r"><code>parties</code></pre>
+<pre><code>## # A tibble: 330 x 9
+##     page  year transaction party1   typenomf typemf spouse side  cite           
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;          
+##  1    18  1923 Business    Allen    Man      Man    N      π     Allen v. Bissi…
+##  2    21  2017 Consumer    Spencer… Man      Man    N      π     Meyer v. Uber …
+##  3    37  1952 Consumer    Calvin … Man      Man    Y      π     Ray v. William…
+##  4    37  1952 Consumer    Katheri… Woman    Woman  Y      π     Ray v. William…
+##  5    47  1954 Property    Lonergan Man      Man    N      π     Lonergan v. Sc…
+##  6    51  1985 Property    Michael… Man      Man    N      π     Normile v. Mil…
+##  7    51  1985 Property    Wawie K… Unknown  Unkno… N      π     Normile v. Mil…
+##  8    51  1985 Property    Segal    Unknown  Unkno… N      π     Normile v. Mil…
+##  9    51  1985 Property    Gladys … Woman    Woman  N      π     Normile v. Mil…
+## 10    61  1998 Employee    Mary El… Woman    Woman  N      π     Cook v. Colwel…
+## # … with 320 more rows</code></pre>
+<pre class="r"><code>parties %&gt;%
+  filter(typenomf == &quot;Woman&quot; | typenomf == &quot;Man&quot; | typenomf == &quot;Business&quot;) %&gt;%
+  ggplot() +
+  geom_bar(mapping = aes(transaction,fill = typenomf)) +
+  scale_fill_brewer(palette = 14) +
+  theme_bw()</code></pre>
+<p><img src="./frug2_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>parties %&gt;%
+  filter(typenomf == &quot;Woman&quot; | typenomf == &quot;Man&quot;) %&gt;%
+  ggplot() +
+  geom_bar(mapping = aes(transaction,fill = typenomf)) +
+  scale_fill_brewer(palette = 18) +
+  theme_bw()</code></pre>
+<p><img src="./frug2_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<pre class="r"><code>parties %&gt;%
+  filter(typenomf == &quot;Business&quot; ) %&gt;%
+  ggplot() +
+  geom_bar(mapping = aes(transaction,fill = typenomf)) +
+  scale_fill_brewer(palette = 9) +
+  theme_bw()</code></pre>
+<p><img src="./frug2_files/figure-html/unnamed-chunk-3-3.png" width="672" /></p>
+<pre class="r"><code>parties %&gt;%
+  filter(typenomf == &quot;Woman&quot; | typenomf == &quot;Man&quot; ) %&gt;%
+  filter(spouse == &quot;N&quot;) %&gt;%
+  ggplot() +
+  geom_bar(mapping = aes(transaction,fill = typenomf)) +
+  scale_fill_brewer(palette = 9) +
+  theme_bw()</code></pre>
+<p><img src="./frug2_files/figure-html/unnamed-chunk-3-4.png" width="672" /></p>
+<pre class="r"><code>parties %&gt;%
+  filter(typenomf == &quot;Woman&quot;) %&gt;%
+  filter(spouse == &quot;N&quot;) %&gt;%
+  ggplot() +
+  geom_bar(aes(year))</code></pre>
+<p><img src="./frug2_files/figure-html/unnamed-chunk-3-5.png" width="672" /></p>
+<p>Gender graphs number of people per year with family status color
+bigger dots</p>
+<pre class="r"><code>parties %&gt;%
+  filter(typenomf == &quot;Woman&quot;) %&gt;%
+  group_by(year, spouse) %&gt;%
+  count() %&gt;%
+  ggplot(aes(year,n, color = spouse)) +
+  geom_point(alpha = 0.5, size = 3, position = position_jitter(w = 1, h = 0.1)) +
+  scale_color_manual(values=c(&quot;red&quot;,&quot;blue&quot;,&quot;forestgreen&quot;), labels = c(&quot;Misc. Family&quot;,&quot;Unrelated&quot;,&quot;Spouse/Partner&quot;)) +
+  labs(title = &quot;Women&quot;)</code></pre>
+<p><img src="./frug2_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>parties %&gt;%
+  filter(typenomf == &quot;Man&quot;) %&gt;%
+  group_by(year, spouse) %&gt;%
+  count() %&gt;%
+  ggplot(aes(year,n, color = spouse)) +
+  geom_point(alpha = 0.5, size = 3, position = position_jitter(w = 1, h = 0.1)) +
+  scale_color_manual(values=c(&quot;red&quot;,&quot;blue&quot;,&quot;forestgreen&quot;), labels = c(&quot;Misc. Family&quot;,&quot;Unrelated&quot;,&quot;Spouse/Partner&quot;)) +
+  labs(title = &quot;Men&quot;)</code></pre>
+<p><img src="./frug2_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<p>Gender graphs number of people per year with transaction color</p>
+<pre class="r"><code>parties %&gt;%
+  filter(typenomf == &quot;Man&quot;) %&gt;%
+  group_by(year, transaction) %&gt;%
+  count() %&gt;%
+  ggplot(aes(year,n, color = transaction, color = gender)) +
+  geom_point(alpha = 0.5, size = 2, position = position_jitter(w = 1, h = 0.1))</code></pre>
+<pre><code>## Warning: Duplicated aesthetics after name standardisation: colour</code></pre>
+<p><img src="./frug2_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>blah &lt;- parties %&gt;%
+  filter(typenomf == &quot;Woman&quot;) %&gt;%
+  group_by(year, transaction) %&gt;%
+  mutate(n = n()) %&gt;%
+  ggplot(aes(year,n, color = transaction, color = transaction,text = paste(party1,&quot; &quot;, typenomf, &quot; &quot;, side))) +
+  geom_point(alpha = 0.5, size = 2, position = position_jitter(w = 1, h = 0.1))</code></pre>
+<pre><code>## Warning: Duplicated aesthetics after name standardisation: colour</code></pre>
+<pre class="r"><code>ggplotly(blah, tooltip = &quot;text&quot;) </code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"data":[{"x":[2007.08051144751,1957.50317230076,1998.81110371416,2008.71209086897,1998.69573292276,2007.076777054,2008.40526180295,2007.50950354617,1916.05417092843,1994.7340330286,1994.10340285534,1985.5620347308],"y":[4.09378599361517,1.04548186440952,1.09634772203863,4.01469316286966,1.06924997037277,4.08041674150154,3.93664847672917,0.959122567437589,1.06189493606798,1.91491666748188,1.99402274228632,1.03360561556183],"text":["Martha Jannusch   Woman   π","Mrs. Johnson   Woman   π","Brenda Taube   Woman   π","Carolyn Billingsly   Woman   π","Susan J. Vogan   Woman   π","Lindsey Naffziger   Woman   ∆","Louann Naffziger   Woman   ∆","Lisa Fletcher   Woman   ∆","Lucy, Lady Duff-Gordon   Woman   ∆","Nancy Kartes   Woman   ∆","Sara Lee Schupf   Woman   ∆","Lillian Thomas   Woman   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":0.5,"size":7.55905511811024,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"Business","legendgroup":"Business","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1951.07058999036,2009.92607397307,2009.38773198891,2011.52663992159,2007.97330462839,1965.70573761174,1964.90247069905,1998.59229808161,2006.94012009166],"y":[0.90434650699608,2.09337168582715,1.91266071163118,1.0011862244457,1.03368948572315,1.98840539194644,1.94607567340136,1.02538688229397,1.01974868583493],"text":["Katherine Ray   Woman   π","Mary E. Defontes   Woman   π","Julianne Ricci   Woman   π","Claudia Aceves   Woman   π","Beverly Speight   Woman   π","Syester   Woman   π","Williams   Woman   π","Sandra Erlich   Woman   π","Pamela Patch   Woman   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(163,165,0,1)","opacity":0.5,"size":7.55905511811024,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(163,165,0,1)"}},"hoveron":"points","name":"Consumer","legendgroup":"Consumer","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1998.01817198889,1996.22794446489,1996.39485052554,1952.85397422733,1982.91360202339,2009.40520690707],"y":[1.08216087236069,1.91261068992317,2.04598100334406,0.966369912074879,1.06307421526872,0.967954189609736],"text":["Mary Ellen Cook   Woman   π","Kathleen Rice   Woman   π","Sondra Locke   Woman   π","Elizabeth Arden   Woman   ∆","Elaine Lukaszewski   Woman   ∆","Joannie Collins   Woman   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,191,125,1)","opacity":0.5,"size":7.55905511811024,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,125,1)"}},"hoveron":"points","name":"Employee","legendgroup":"Employee","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1891.09528029151,1986.17000855226,2018.94885489857,2005.48864365416,2006.84639931424,1918.43799891835,2014.51491593337,2008.89399838308,2017.73466504226],"y":[0.909187864372507,0.941898537008092,2.04205326694064,2.01472938717343,1.99227276416495,1.0771467037499,0.909842107910663,1.09793268898502,1.96945024104789],"text":["Hamer   Woman   π","Sue Ann Watts   Woman   π","C.M.   Woman   π","Theresa Chen   Woman   π","Wheamei Chen   Woman   π","Salt   Woman   ∆","Virginia H. Rogers   Woman   ∆","Kathryn L. Dow   Woman   ∆","T.B.   Woman   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,176,246,1)","opacity":0.5,"size":7.55905511811024,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,176,246,1)"}},"hoveron":"points","name":"Family","legendgroup":"Family","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1984.51936145267,1844.94773000944,2007.66685741954,1995.96474634344,2009.57365135523,1987.04381135199,2011.03342627641,1985.64578099037,2006.51773262909,1982.16023454908,1984.42924499279,2009.56612980366,1993.75173192192,1992.87752512982,2012.81552949734,1986.49820063217,1981.13678124221],"y":[1.97208216744475,1.03559864852577,0.953862074390054,0.940077097853646,2.0242806869559,0.938295837119222,1.92129093762487,1.99800912854262,1.001283693593,2.07278255773708,1.99474028134719,1.96159842005,0.992507399152964,0.937521847523749,1.94946491373703,1.95212959554046,1.90291256038472],"text":["Gladys Hawkins   Woman   π","Antillico Kirksey   Woman   π","Teresa L. Harvey   Woman   π","Coretta Scott King   Woman   π","Betty Beaver   Woman   π","Marguerite B. Joyner   Woman   π","Frances M. Sparrow   Woman   π","Gloria R. Hill   Woman   π","Charis Higgins   Woman   π","Martha Messerly   Woman   π","Hazel Miller   Woman   ∆","Karen Brumlow   Woman   ∆","Patricia Hart   Woman   ∆","Mary Shrader   Woman   ∆","Susan A. Demonico   Woman   ∆","Barbara R. Jones   Woman   ∆","Nancy Pickles   Woman   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(231,107,243,1)","opacity":0.5,"size":7.55905511811024,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(231,107,243,1)"}},"hoveron":"points","name":"Property","legendgroup":"Property","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.2283105022831,"r":7.30593607305936,"b":40.1826484018265,"l":31.4155251141553},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1836.24767376499,2027.64891114302],"tickmode":"array","ticktext":["1850","1900","1950","2000"],"tickvals":[1850,1900,1950,2000],"categoryorder":"array","categoryarray":["1850","1900","1950","2000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"year","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.744874532665126,4.25325796794612],"tickmode":"array","ticktext":["1","2","3","4"],"tickvals":[1,2,3,4],"categoryorder":"array","categoryarray":["1","2","3","4"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"n","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.913385826771654},"annotations":[{"text":"transaction","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"eb4c3ac43570":{"x":{},"y":{},"colour":{},"colour.1":{},"text":{},"type":"scatter"}},"cur_data":"eb4c3ac43570","visdat":{"eb4c3ac43570":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>parties %&gt;%
+  filter(typemf == &quot;MBusiness&quot; | typemf == &quot;FBusiness&quot;)</code></pre>
+<pre><code>## # A tibble: 23 x 9
+##     page  year transaction party1    typenomf typemf  spouse side  cite         
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;        
+##  1   165  1998 Business    Princess… Business FBusin… N      π     Princess Cru…
+##  2   184  2007 Business    Paul Got… Business MBusin… N      π     Paul Gottlie…
+##  3   274  1933 Business    James Ba… Business MBusin… N      π     James Baird …
+##  4   285  1998 Business    Pop&#39;s Co… Business MBusin… N      π     Pop&#39;s Cones,…
+##  5   757  1998 Business    Mel Fran… Business MBusin… N      π     Mel Frank To…
+##  6   849  1995 Business    Truman L… Business MBusin… N      π     Truman L. Fl…
+##  7   949  2003 Business    Zapata H… Business MBusin… N      π     Zapata Herma…
+##  8  1123  1986 Business    Sally Be… Business FBusin… N      π     Sally Beauty…
+##  9  1123  1986 Business    Alberto-… Business MBusin… N      π     Sally Beauty…
+## 10    37  1952 Consumer    William … Business MBusin… N      ∆     Ray v. Willi…
+## # … with 13 more rows</code></pre>
+<pre class="r"><code>parties %&gt;%
+  filter(spouse == &quot;Y&quot;) %&gt;%
+  group_by(typenomf) %&gt;%
+  count()</code></pre>
+<pre><code>## # A tibble: 2 x 2
+## # Groups:   typenomf [2]
+##   typenomf     n
+##   &lt;chr&gt;    &lt;int&gt;
+## 1 Man         26
+## 2 Woman       30</code></pre>
+<pre class="r"><code>parties %&gt;%
+  filter(transaction == &quot;Property&quot;, typenomf == &quot;Business&quot;)</code></pre>
+<pre><code>## # A tibble: 3 x 9
+##    page  year transaction party1     typenomf typemf  spouse side  cite         
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;        
+## 1   650  2006 Property    American … Business Busine… N      ∆     Higgins v. S…
+## 2   650  2006 Property    Disney/AB… Business Busine… N      ∆     Higgins v. S…
+## 3   650  2006 Property    Lock and … Business Busine… N      ∆     Higgins v. S…</code></pre>
+<pre class="r"><code>parties %&gt;%
+  filter(spouse != &quot;Y&quot;, spouse != &quot;F&quot;, typenomf == &quot;Woman&quot;)</code></pre>
+<pre><code>## # A tibble: 16 x 9
+##     page  year transaction party1    typenomf typemf spouse side  cite          
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;         
+##  1    51  1985 Property    Gladys H… Woman    Woman  N      π     Normile v. Mi…
+##  2    61  1998 Employee    Mary Ell… Woman    Woman  N      π     Cook v. Colwe…
+##  3   102  1891 Family      Hamer     Woman    Woman  N      π     Hamer v. Sidw…
+##  4   197  2009 Consumer    Mary E. … Woman    Woman  N      π     Defontes v. D…
+##  5   197  2009 Consumer    Julianne… Woman    Woman  N      π     Defontes v. D…
+##  6   277  1958 Business    Mrs. Joh… Woman    Woman  N      π     Drennan v. St…
+##  7   285  1998 Business    Brenda T… Woman    Woman  N      π     Pop&#39;s Cones, …
+##  8   368  1997 Employee    Kathleen… Woman    Woman  N      π     Alaska Dem. P…
+##  9   579  2012 Property    Frances … Woman    Woman  N      π     Sparrow v. De…
+## 10    51  1985 Property    Hazel Mi… Woman    Woman  N      ∆     Normile v. Mi…
+## 11   154  2007 Business    Lisa Fle… Woman    Woman  N      ∆     E.C. Styberg …
+## 12   347  1953 Employee    Elizabet… Woman    Woman  N      ∆     Crabtree v. E…
+## 13   482  1917 Business    Lucy, La… Woman    Woman  N      ∆     Wood v. Lucy,…
+## 14   849  1995 Business    Sara Lee… Woman    Woman  N      ∆     Truman L. Fla…
+## 15   889  1983 Employee    Elaine L… Woman    Woman  N      ∆     Handicapped C…
+## 16  1024  1985 Business    Lillian … Woman    Woman  N      ∆     Lancellotti v…</code></pre>
+<pre class="r"><code>interactive &lt;- parties %&gt;%
+  filter(typenomf == &quot;Woman&quot;) %&gt;%
+  group_by(year) %&gt;%
+  mutate(count = n()) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(year,count, color = spouse, text = paste(party1,&quot; &quot;, side))) +
+  geom_point(alpha = 0.5, size = 1.5, position = position_jitter(w = 0.2, h = 0.2)) +
+  scale_color_manual(values=c(&quot;red&quot;,&quot;blue&quot;,&quot;forestgreen&quot;), labels = c(&quot;Misc. Family&quot;,&quot;Unrelated&quot;,&quot;Spouse/Partner&quot;)) +
+  labs(title = &quot;Women&quot;)
+
+ ggplotly(interactive, tooltip = &quot;text&quot;) </code></pre>
+<div id="htmlwidget-2" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"data":[{"x":[1965.05503736464,2005.9439315605,2006.13899714462,1919.04850576073,2007.82233881531,2008.12239335431,2009.93954551863],"y":[1.95780666461214,2.90817311294377,2.94174978099763,1.0221197350882,7.17676842967048,7.11126001402736,2.87793708993122],"text":["Williams   π","Charis Higgins   π","Theresa Chen   π","Salt   ∆","Lindsey Naffziger   ∆","Louann Naffziger   ∆","Joannie Collins   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":0.5,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"F","legendgroup":"F","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1984.92135895705,1997.98211188186,1891.08785303608,2009.14158912413,2008.85702351136,1957.92276768228,1997.93865218768,1997.03805336636,2011.94728563139,1984.9717528455,2006.8027352917,1953.10667666364,1917.14081636099,1995.0947504404,1983.14651337871,1984.82669331506],"y":[2.90411873254925,2.10439162738621,0.859055626112968,1.81243628785014,2.03549509076402,1.12590915374458,1.91797734145075,1.81441852850839,2.1847898742184,2.95433252025396,1.87104605771601,1.10855018328875,0.886161459889263,3.00682644918561,0.832942589744926,3.06009536962956],"text":["Gladys Hawkins   π","Mary Ellen Cook   π","Hamer   π","Mary E. Defontes   π","Julianne Ricci   π","Mrs. Johnson   π","Brenda Taube   π","Kathleen Rice   π","Frances M. Sparrow   π","Hazel Miller   ∆","Lisa Fletcher   ∆","Elizabeth Arden   ∆","Lucy, Lady Duff-Gordon   ∆","Sara Lee Schupf   ∆","Elaine Lukaszewski   ∆","Lillian Thomas   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":0.5,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"N","legendgroup":"N","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1952.12975447197,2008.19523660997,1844.82395350169,2008.09189268416,1995.14801630834,2010.88701857878,1987.18235433502,2009.94310191209,1986.86370821437,1997.15894200876,2008.15226203734,1965.14398448989,1985.82991946563,2017.9564401581,1982.18841901813,2007.96806770498,1999.12075071484,1999.18393498389,2006.11424603099,2014.14741108539,2007.8152795136,2009.81290360941,1994.04354781238,1991.95364734344,2011.94896743558,1985.88838698361,1995.08500734661,2017.93714693524,1981.99976737909,2007.11542061912],"y":[1.10366507573053,6.91726340614259,1.13631752356887,6.95975182633847,3.02756591513753,1.16080932691693,2.10879928218201,2.85526973698288,1.95512603120878,1.98786633433774,6.99790366850793,2.06543015511706,1.89348939247429,1.83817195845768,1.97467122031376,6.81939149620011,2.09637021142989,1.91985379522666,3.05914624826983,1.17133447173983,6.84938004733995,3.00018765563145,0.896537131350488,1.14890423631296,1.84451626101509,2.1113025973551,2.95466383229941,2.12257314687595,2.17513244030997,1.86982862474397],"text":["Katherine Ray   π","Martha Jannusch   π","Antillico Kirksey   π","Teresa L. Harvey   π","Coretta Scott King   π","Claudia Aceves   π","Sue Ann Watts   π","Betty Beaver   π","Marguerite B. Joyner   π","Sondra Locke   π","Beverly Speight   π","Syester   π","Gloria R. Hill   π","C.M.   π","Martha Messerly   π","Carolyn Billingsly   π","Sandra Erlich   π","Susan J. Vogan   π","Wheamei Chen   π","Virginia H. Rogers   ∆","Kathryn L. Dow   ∆","Karen Brumlow   ∆","Patricia Hart   ∆","Mary Shrader   ∆","Susan A. Demonico   ∆","Barbara R. Jones   ∆","Nancy Kartes   ∆","T.B.   ∆","Nancy Pickles   ∆","Pamela Patch   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(34,139,34,1)","opacity":0.5,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(34,139,34,1)"}},"hoveron":"points","name":"Y","legendgroup":"Y","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.7625570776256,"r":7.30593607305936,"b":40.1826484018265,"l":31.4155251141553},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"title":{"text":"Women","font":{"color":"rgba(0,0,0,1)","family":"","size":17.5342465753425},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1836.16732916887,2026.61306449092],"tickmode":"array","ticktext":["1850","1900","1950","2000"],"tickvals":[1850,1900,1950,2000],"categoryorder":"array","categoryarray":["1850","1900","1950","2000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"year","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.515751297748648,7.49395972166676],"tickmode":"array","ticktext":["2","4","6"],"tickvals":[2,4,6],"categoryorder":"array","categoryarray":["2","4","6"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.913385826771654},"annotations":[{"text":"spouse","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"eb4cc4930d5":{"x":{},"y":{},"colour":{},"text":{},"type":"scatter"}},"cur_data":"eb4cc4930d5","visdat":{"eb4cc4930d5":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>interactive2 &lt;- parties %&gt;%
+  filter(typenomf == &quot;Business&quot;) %&gt;%
+  group_by(year) %&gt;%
+  mutate(count = n()) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(year,count, color = typemf, shape = transaction, text = paste(party1,&quot; &quot;, transaction, &quot; &quot;, side))) +
+  geom_point(alpha = 0.5, size = 1.5, position = position_jitter(w = 1, h = 1)) +
+  scale_color_manual(values=c(&quot;red&quot;,&quot;blue&quot;,&quot;forestgreen&quot;), labels = c(&quot;Misc. Family&quot;,&quot;Unrelated&quot;,&quot;Spouse/Partner&quot;)) +
+  labs(title = &quot;Women&quot;)
+
+ggplotly(interactive2, tooltip = &quot;text&quot;) </code></pre>
+<div id="htmlwidget-3" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3">{"x":{"data":[{"x":[1989.9835435506,2006.7313216771,2007.08245586138,1988.10507620685,1998.49362063082,1996.93294268474,1960.50150431413,1974.40259099193,1990.75860565621,1980.8347032587,2002.67630695645,2001.11080883211,1983.01319335634,1977.59760728991,1995.18027336383,2017.2738976758,1990.28146825358,1995.94923021644,2013.1247144863,1977.72191150114,1996.52171235159,2008.52674542647,1980.60589556815,1996.2110060202,1997.41227878723,1929.21905750548,1992.01816861611,1973.55315744178,1967.74445024692,1923.65666544996,1989.5778519637,2005.15484368708,2007.56866875663,1998.41737812525,2006.38557180809,1957.51083672792,1997.40869314317,1996.66452245321,1960.3127630516,1975.8112397287,1992.60163933411,1991.11129412334,1981.28734186944,1978.12675663736,2002.57175651472,1982.67198225344,1983.22950215545,1977.43112550071,2017.49925597571,1998.1421282771,1989.52515013982,2014.35443975311,1977.04301639274,1977.43945554784,1994.87288289284,1996.53045328986,2007.51495748712,1854.32549285702,1996.39205362229,1993.82427064981,2003.81893312326,2003.11903835181,1993.66130624246,1973.10531419655,1995.16790086543,1998.51795620611,1998.61779048666,1986.09924604744],"y":[5.83697901433334,4.29547569993883,3.60147165227681,2.90245544072241,7.38183274073526,8.24222870077938,1.78540006512776,1.49482520949095,2.94031222490594,3.4635607842356,3.70610041357577,2.73822606122121,4.24065425433218,3.03138628276065,6.30743488762528,5.3300822833553,4.19708577683195,6.56567131076008,2.69146918831393,2.7636756892316,9.39866942027584,3.00173117499799,2.9359636050649,9.71562694897875,8.68062224937603,0.170474384911358,2.40135631384328,3.56983069423586,1.16017777845263,1.47713112831116,5.72790079331025,4.36185757583007,3.11442255740985,7.23462407989427,3.65557875111699,0.440794593188912,8.37282561464235,9.93633798416704,1.53901474457234,1.18910281825811,3.26892240624875,2.61369619518518,3.95608097780496,2.45808838028461,2.03522664774209,3.55838361429051,4.05599573766813,2.08396995300427,4.53008312545717,7.20409386046231,5.86263713892549,1.43364173173904,3.45599248120561,3.55823670560494,5.15314162196591,9.65483945887536,3.15836176276207,2.3111758264713,8.18770231492817,2.93661137763411,4.45361635088921,4.94765283446759,1.71408784156665,3.70708671025932,5.49949718592688,3.45084377378225,4.90641278447583,3.02189994696528],"text":["Quake Construction, Inc.   Business   π","Pennsy Supply, Inc.   Business   π","E.C. Styberg Engineering Co.   Business   π","Brown Machine, Inc.   Business   π","TCBY Systems, Inc.   Business   π","Equity Contracting Co.   Business   π","Frigaliment Importing Co.   Business   π","C & J Fertilizer, Inc.   Business   π","Sherrod, Inc.   Business   π","Nanakuli Paving and Rock Company   Business   π","Corporate Dynamics   Business   π","Philadelphia Benefits Corporation   Business   π","Morin Building Products Co.   Business   π","Totem Marine Tug & Barge, Inc.   Business   π","Park 100 Investors, Inc.   Business   π","Hemlock Semiconductor Operations, LLC   Business   π","Kelsey-Hayes Corporation   Business   π","Brookside Farms   Business   π","enXco Development Corp.   Business   π","J.N.A. Realty Corp.   Business   π","Hornell Brewing Co.   Business   π","Crabby's, Inc   Business   π","American Standard, Inc.   Business   π","Florafax International, Inc., d/b/a Flora Plenty   Business   π","Bellerose Floral, Inc.   Business   π","Luten Bridge Co.   Business   π","Jetz Service Co.   Business   π","Coastal Steel Erectors, Inc.   Business   π","City Stores Co.   Business   π","Bissinger & Co.   Business   ∆","American Airlines, Inc.   Business   ∆","American Ash Recycling Corp. of Pennsylvania   Business   ∆","Eaton Corp.   Business   ∆","General Electric Co.   Business   ∆","Alps South Corp.   Business   ∆","Star Paving Co.   Business   ∆","Resorts International Hotel, Inc.   Business   ∆","Commerce Partnership 8098 Limited Partnership   Business   ∆","B.N.S. International Sales Corp.   Business   ∆","Allied Mutual Insurance Co.   Business   ∆","State Farm Mutual Automobile Insurance Co.   Business   ∆","Morrison-Knudsen Co.   Business   ∆","Shell Oil Company   Business   ∆","Raynor Manufacturing Co.   Business   ∆","Summit Bank   Business   ∆","Baystone Construction, Inc.   Business   ∆","General Motorcs   Business   ∆","Alyeska Pipeline Service Co.   Business   ∆","Solarworld Industries Sachsen GmbH   Business   ∆","Di-Chem Co.   Business   ∆","Galtaco Redlaw Castings Corp.   Business   ∆","Northern States Power Co.   Business   ∆","Cross Bay Chelsea, Inc.   Business   ∆","Foro Romano Corp.   Business   ∆","American National Bank and Trust Company of Chicago (American)   Business   ∆","Arizona Tea Products Ltd.   Business   ∆","Pro 100 Realty   Business   ∆","Pickford & Co   Business   ∆","GTE Market Resources, Inc.   Business   ∆","Salinas Properties   Business   ∆","Hearthside Baking Company, Inc.   Business   ∆","Lenell   Business   ∆","Toyota Motor Sales, U.S.A., Inc.   Business   ∆","United States Fidelity and Guaranty Company   Business   ∆","Titan Sports, Inc.   Business   ∆","Hayes Appraisal Associates, Inc.   Business   ∆","MidAmerica Savings Bank   Business   ∆","Nexxus Product Co.   Business   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":0.5,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"Business","legendgroup":"Business","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1999.04047472309,2017.46115415916,2016.27556543611,1921.26142598549,2016.72490247432,2009.91768673994,2016.39025445562,2010.61262042494,1999.90280023497,2007.20503695635,1965.55808727071,2015.31021635467],"y":[1.94857235997915,5.78072166396305,4.6146377059631,1.91242867521942,5.51012337673455,1.77475980296731,3.65205455664545,0.717591078020632,3.55301092378795,3.78632747195661,2.93610930209979,2.08369328454137],"text":["Credit Bureau Enterprises, Inc.   Consumer   π","BWM Financial   Consumer   π","Firstsource Advantage, LLC   Consumer   π","Jacob & Youngs, Inc.   Consumer   π","Uber Technologies, Inc.   Consumer   ∆","Dell, Inc.   Consumer   ∆","Provide Commerce, Inc.   Consumer   ∆","U.S. Bank, N.A.   Consumer   ∆","Bayliner Marine Corp.   Consumer   ∆","Walters Development Co.   Consumer   ∆","Walker-Thomas Furniture Co.   Consumer   ∆","Wells Fargo Bank, N.A.   Consumer   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":0.5,"size":5.66929133858268,"symbol":"triangle-up","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(Business,Consumer)","legendgroup":"(Business,Consumer)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1996.82667417405,1998.63727251627,1902.16457938496,2002.42929914314,1936.91955516813,2015.77099344973,2010.38357840432,1982.87300493801],"y":[9.30998765025288,4.73573270719498,0.862004057969898,3.64684330066666,1.86648020287976,3.86734486650676,1.62796719372272,4.88863807916641],"text":["Caritas Films   Employee   π","Valley Medical Specialists   Employee   π","Alaska Packers' Association   Employee   π","Reier Broadcasting Co.   Employee   π","Indian Refining Co.   Employee   ∆","Securitas Security Services   Employee   ∆","SKM Wood Products, LLC   Employee   ∆","Hightower Productions Ltd.   Employee   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":0.5,"size":5.66929133858268,"symbol":"square","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(Business,Employee)","legendgroup":"(Business,Employee)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2006.17714740802,2005.59733940521,2006.19518084079],"y":[5.56633889768273,5.48961086478084,4.62778625776991],"text":["American Broadcasting Companies, Inc.   Property   ∆","Disney/ABC International Television   Property   ∆","Lock and Key Production   Property   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","opacity":0.5,"size":5.66929133858268,"symbol":"cross-thin-open","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)"}},"hoveron":"points","name":"(Business,Property)","legendgroup":"(Business,Property)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1998.21341196587,1986.68868986284,1995.99049629457],"y":[8.77041207673028,2.6713228081353,5.91266787843779],"text":["Princess Cruises, Inc.   Business   π","Sally Beauty Co.   Business   π","Mama Rizzo's, Inc.   Business   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":0.5,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(FBusiness,Business)","legendgroup":"(FBusiness,Business)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1953.83889357792],"y":[0.276025119237602],"text":"Elizabeth Arden Sales Corp.   Employee   ∆","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,255,1)","opacity":0.5,"size":5.66929133858268,"symbol":"square","line":{"width":1.88976377952756,"color":"rgba(0,0,255,1)"}},"hoveron":"points","name":"(FBusiness,Employee)","legendgroup":"(FBusiness,Employee)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2007.92789866123,1933.86359800119,1998.91832849383,1997.05027015507,1995.70955748763,2002.25474027079,1985.73802076187,1989.41299667675,1988.42013646848,1932.0548725985,1853.20437270449,1973.54933238449],"y":[4.40881608845666,2.49297214532271,8.4374128812924,8.18694013077766,5.28659483091906,3.69795540394261,2.53942116908729,5.31295510195196,2.3696637256071,1.91127851326019,1.3761120592244,3.77487744484097],"text":["Paul Gottlieb & Co., Inc.   Business   π","James Baird Co.   Business   π","Pop's Cones   Business   π","Mel Frank Tool & Supply, Inc.   Business   π","Truman L. Flatt & Sons, Co.   Business   π","Zapata Hermanos Sucesores, S.A.   Business   π","Alberto-Culver Company   Business   π","Jones Brothers Construction Corporation   Business   ∆","Hercules Inc.   Business   ∆","Gimbel Bros., Inc.   Business   ∆","Messrs. Joyce & Co.   Business   ∆","Algernon Blair, Inc.   Business   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(34,139,34,1)","opacity":0.5,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(34,139,34,1)"}},"hoveron":"points","name":"(MBusiness,Business)","legendgroup":"(MBusiness,Business)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1951.92138899816,2012.73296707589,1964.01110843429],"y":[0.285229973495007,1.19933245191351,1.62111997185275],"text":["William G. Eurice & Bros., Inc.   Consumer   ∆","R.J. Reynolds Tobacco Co.   Consumer   ∆","Arthur Murray Studio   Consumer   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(34,139,34,1)","opacity":0.5,"size":5.66929133858268,"symbol":"triangle-up","line":{"width":1.88976377952756,"color":"rgba(34,139,34,1)"}},"hoveron":"points","name":"(MBusiness,Consumer)","legendgroup":"(MBusiness,Consumer)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1998.64117067913,2004.22004208434,1979.73257896537,1996.73318844289],"y":[8.90838568517938,0.156988189555705,1.44512986205518,8.35472473315895],"text":["Coldwell Banker/Frank Laiben Realty Co.   Employee   ∆","Marshall Durbin Food Corp.   Employee   ∆","Danny Dare, Inc.   Employee   ∆","Warner Bros., Inc.   Employee   ∆"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(34,139,34,1)","opacity":0.5,"size":5.66929133858268,"symbol":"square","line":{"width":1.88976377952756,"color":"rgba(34,139,34,1)"}},"hoveron":"points","name":"(MBusiness,Employee)","legendgroup":"(MBusiness,Employee)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.7625570776256,"r":7.30593607305936,"b":40.1826484018265,"l":48.9497716894977},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"title":{"text":"Women","font":{"color":"rgba(0,0,0,1)","family":"","size":17.5342465753425},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1844.98962854093,2025.71400013927],"tickmode":"array","ticktext":["1850","1900","1950","2000"],"tickvals":[1850,1900,1950,2000],"categoryorder":"array","categoryarray":["1850","1900","1950","2000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"year","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.331979300174862,10.4253054738976],"tickmode":"array","ticktext":["0.0","2.5","5.0","7.5","10.0"],"tickvals":[0,2.5,5,7.5,10],"categoryorder":"array","categoryarray":["0.0","2.5","5.0","7.5","10.0"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.826771653543307},"annotations":[{"text":"transaction<br />typemf","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"eb4c68650667":{"x":{},"y":{},"colour":{},"shape":{},"text":{},"type":"scatter"}},"cur_data":"eb4c68650667","visdat":{"eb4c68650667":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
